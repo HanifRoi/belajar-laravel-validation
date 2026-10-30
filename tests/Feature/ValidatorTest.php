@@ -7,7 +7,9 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Validator;
 use Tests\TestCase;
 
+use function PHPUnit\Framework\assertFalse;
 use function PHPUnit\Framework\assertNotNull;
+use function PHPUnit\Framework\assertTrue;
 
 class ValidatorTest extends TestCase
 {
@@ -19,11 +21,35 @@ class ValidatorTest extends TestCase
         ];
 
         $rules = [
-            'admin'=>'required',
+            'username'=>'required',
             'password'=>'required'
         ];
         
         $validator = Validator::make($data, $rules);
         assertNotNull($validator);
+
+        assertTrue($validator->passes());
+        assertFalse($validator->fails());
+
+    }
+
+    public function testValidatorInvalid()
+    {
+        $data = [
+            'username'=>'',
+            'password'=>''
+        ];
+
+        $rules = [
+            'username'=>'required',
+            'password'=>'required'
+        ];
+        
+        $validator = Validator::make($data, $rules);
+        assertNotNull($validator);
+
+        assertFalse($validator->passes());
+        assertTrue($validator->fails());
+
     }
 }
