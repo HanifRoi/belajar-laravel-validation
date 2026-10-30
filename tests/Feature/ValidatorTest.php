@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -106,6 +107,7 @@ class ValidatorTest extends TestCase
 
     public function testValidatorMultipleRules()
     {
+        App::setLocale('id');
         $data = [
             'username'=>'helo',
             'password'=>'helo'
@@ -152,6 +154,36 @@ class ValidatorTest extends TestCase
             $message = $exception->validator->errors();
             Log::error($message->toJson(JSON_PRETTY_PRINT));
         }
+    }
+
+    public function testValidatorInlineMessage()
+    {
+       
+        $data = [
+            'username'=>'helo',
+            'password'=>'helo'
+        ];
+
+        $rules = [
+            'username'=>'required|max:100|email',//bisa kaya gini
+            'password'=>['required', 'min:6', 'max:20']//atau bisa kaya gini
+        ];
+        $message = [
+            'requred'=>':attribute Harus diisi',
+            'email'=>':attribute Harus Email',
+            'min'=>':attribute Minimal :min Karakter',
+            'max'=>':attribute Maksimal :max Karakter'
+        ]; //disarankan tetep pake folder lang ID
+        
+        $validator = Validator::make($data, $rules, $message);
+        assertNotNull($validator);
+
+        assertFalse($validator->passes());
+        assertTrue($validator->fails());
+
+        $message = $validator->getMessageBag();
+        Log::info($message->toJson(JSON_PRETTY_PRINT));
+
     }
  
 
