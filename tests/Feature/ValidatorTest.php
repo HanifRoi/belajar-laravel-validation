@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 use function PHPUnit\Framework\assertFalse;
@@ -76,4 +77,32 @@ class ValidatorTest extends TestCase
         Log::info($message->toJson(JSON_PRETTY_PRINT));
 
     }
+
+    public function testValidationExeption()
+    {
+        $data = [
+            'username'=>'',
+            'password'=>''
+        ];
+
+        $rules = [
+            'username'=>'required',
+            'password'=>'required'
+        ];
+        
+        $validator = Validator::make($data, $rules);
+        assertNotNull($validator);
+
+        try {
+            $validator->validate();
+            self::fail('ValidationException not thrown');
+        } catch (ValidationException $exception) {
+            assertNotNull($exception->validator);
+            // $exception->errors(); bisa juga untuk menangkap pesan error
+            $message = $exception->validator->errors();
+            Log::error($message->toJson(JSON_PRETTY_PRINT));
+        }
+    }
+ 
+
 }
