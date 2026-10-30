@@ -15,7 +15,7 @@
                 @endforeach
             </ul>
         @endif
-
+        
         <form action="/form" method="POST">
             @csrf
             <label>Username : @error('username')
