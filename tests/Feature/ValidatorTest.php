@@ -126,6 +126,33 @@ class ValidatorTest extends TestCase
         Log::info($message->toJson(JSON_PRETTY_PRINT));
 
     }
+
+    public function testValidatorValidData()
+    {
+        $data = [
+            'username'=>'hanif@gmail.com',
+            'password'=>'rahasia',
+            'admin'=>true //artinya si admin ini gak di masukan karena tidak divalidasi, gak akan kita ambil, lebih aman
+        ];
+
+        $rules = [
+            'username'=>'required|max:100|email',//bisa kaya gini
+            'password'=>['required', 'min:6', 'max:20']//atau bisa kaya gini
+        ];
+        
+        $validator = Validator::make($data, $rules);
+        assertNotNull($validator);
+
+        try {
+            $valid = $validator->validate();
+            Log::info(json_encode($valid, JSON_PRETTY_PRINT));
+        } catch (ValidationException $exception) {
+            assertNotNull($exception->validator);
+            // $exception->errors(); bisa juga untuk menangkap pesan error
+            $message = $exception->validator->errors();
+            Log::error($message->toJson(JSON_PRETTY_PRINT));
+        }
+    }
  
 
 }
