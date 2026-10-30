@@ -103,6 +103,29 @@ class ValidatorTest extends TestCase
             Log::error($message->toJson(JSON_PRETTY_PRINT));
         }
     }
+
+    public function testValidatorMultipleRules()
+    {
+        $data = [
+            'username'=>'helo',
+            'password'=>'helo'
+        ];
+
+        $rules = [
+            'username'=>'required|max:100|email',//bisa kaya gini
+            'password'=>['required', 'min:6', 'max:20']//atau bisa kaya gini
+        ];
+        
+        $validator = Validator::make($data, $rules);
+        assertNotNull($validator);
+
+        assertFalse($validator->passes());
+        assertTrue($validator->fails());
+
+        $message = $validator->getMessageBag();
+        Log::info($message->toJson(JSON_PRETTY_PRINT));
+
+    }
  
 
 }
