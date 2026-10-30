@@ -293,6 +293,76 @@ class ValidatorTest extends TestCase
         Log::info($message->toJson(JSON_PRETTY_PRINT));
 
     }
+
+    public function testValidatorNestedArrayValidation()
+    {
+        $data = [
+            'name'=>[
+                'first'=>'Hanif',
+                'last'=>''
+            ],
+            'address'=>[
+                'street'=>'Jalan Raya',
+                'city'=>'Kebumen',
+                'country'=>'Indonesia'
+            ]
+        ];
+
+        $rules = [
+           'name.first'=>['required', 'max:10'],
+           'name.last'=>['max:10'],
+           'address.street'=>['max:100'],
+           'address.city'=>['required', 'max:100'],
+           'address.country'=>['required', 'max:100']
+        ];
+        
+        $validator = Validator::make($data, $rules);
+        assertNotNull($validator);
+
+        assertFalse($validator->fails());
+        assertTrue($validator->passes());
+
+        $message = $validator->getMessageBag();
+        Log::info($message->toJson(JSON_PRETTY_PRINT));
+
+    }
+
+    public function testValidatorIndexedArrayValidation()
+    {
+        $data = [
+            'name'=>[
+                'first'=>'Hanif',
+                'last'=>''
+            ],
+            'address'=>[
+                ['street'=>'Jalan Raya',
+                'city'=>'Kebumen',
+                'country'=>'Indonesia'],
+                [
+                    'street'=>'Jalan Rayu',
+                    'city'=>'Kyoto',
+                    'country'=>'Jepang'
+                ]
+            ]
+        ];
+
+        $rules = [
+           'name.first'=>['required', 'max:10'],
+           'name.last'=>['max:10'],
+           'address.*.street'=>['max:100'],
+           'address.*.city'=>['required', 'max:100'],
+           'address.*.country'=>['required', 'max:100']
+        ];
+        
+        $validator = Validator::make($data, $rules);
+        assertNotNull($validator);
+
+        assertTrue($validator->passes());
+
+        $message = $validator->getMessageBag();
+        Log::info($message->toJson(JSON_PRETTY_PRINT));
+
+    }
  
 
 }
